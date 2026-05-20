@@ -1,9 +1,10 @@
 package dev.danvega.markets;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -13,14 +14,18 @@ public class ChatController {
 
     public ChatController(ChatClient.Builder builder, VectorStore vectorStore) {
         this.chatClient = builder
-                .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore))
+                .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore).build())
                 .build();
     }
 
-    @GetMapping("/")
-    public String chat() {
+    @GetMapping("/chat")
+    public String chat(@RequestParam(required=false) String prompt) {
+    	String actualPrompt = prompt;
+    	if (prompt == null || prompt.isEmpty()) {
+    		actualPrompt = "How did the Federal Reserve's recent interest rate cut impact various asset classes according to the analysis";
+    	}
         return chatClient.prompt()
-                .user("How did the Federal Reserve's recent interest rate cut impact various asset classes according to the analysis")
+                .user(actualPrompt)
                 .call()
                 .content();
     }

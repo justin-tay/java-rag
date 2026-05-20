@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: markets
+  ai:
+    model:
+      chat: openai
+      embedding: ollama
+    openai:
+      api-key: ${OPENROUTER_API_KEY}
+      base-url: https://openrouter.ai/api
+      chat:
+        options:
+          model: openai/gpt-oss-120b:free
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        model: nomic-embed-text
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+  docker:
+    compose:
+      lifecycle-management: start_only
+logging:
+  level:
+    # Suppress WARN logs from FileSystemFontProvider
+    org.apache.pdfbox.pdmodel.font.FileSystemFontProvider: ERROR
+    org.springframework.ai.embedding: DEBUG
+    org.springframework.ai.vectorstore: DEBUG
+    org.springframework.ai.chat.client: DEBUG
+    org.springframework.ai.chat.client.advisor: DEBUG
+    org.springframework.ai.chat.client.advisor.question: DEBUG
